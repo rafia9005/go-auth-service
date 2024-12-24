@@ -2,23 +2,8 @@
     <div style="display: inline-block;">
         <h2 style="display: inline-block; vertical-align: middle; margin-top: 0;">GO-AUTH-SERVICE</h2>
         <p>
-	<em><code>❯ REPLACE-ME</code></em>
+	<em>A Go-based authentication service that supports login and registration with email, as well as OAuth integration with Google and GitHub. The service is built with Docker and Docker Compose for easy setup and deployment.</em>
 </p>
-        <p>
-	<img src="https://img.shields.io/github/license/rafia9005/go-auth-service?style=social&logo=opensourceinitiative&logoColor=white&color=0080ff" alt="license">
-	<img src="https://img.shields.io/github/last-commit/rafia9005/go-auth-service?style=social&logo=git&logoColor=white&color=0080ff" alt="last-commit">
-	<img src="https://img.shields.io/github/languages/top/rafia9005/go-auth-service?style=social&color=0080ff" alt="repo-top-language">
-	<img src="https://img.shields.io/github/languages/count/rafia9005/go-auth-service?style=social&color=0080ff" alt="repo-language-count">
-</p>
-        <p>Built with the tools and technologies:</p>
-        <p>
-	<img src="https://img.shields.io/badge/Redis-DC382D.svg?style=social&logo=Redis&logoColor=white" alt="Redis">
-	<img src="https://img.shields.io/badge/NOW-001211.svg?style=social&logo=NOW&logoColor=white" alt="NOW">
-	<img src="https://img.shields.io/badge/Go-00ADD8.svg?style=social&logo=Go&logoColor=white" alt="Go">
-	<img src="https://img.shields.io/badge/MySQL-4479A1.svg?style=social&logo=MySQL&logoColor=white" alt="MySQL">
-	<img src="https://img.shields.io/badge/Docker-2496ED.svg?style=social&logo=Docker&logoColor=white" alt="Docker">
-</p>
-    </div>
 </div>
 <br clear="left"/>
 
