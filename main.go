@@ -4,10 +4,12 @@ import (
 	"fmt"
 	handler "go-auth-service/internal/handlers"
 	"go-auth-service/pkg/config"
+	"go-auth-service/pkg/logs"
 	"go-auth-service/pkg/utils"
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
@@ -24,6 +26,8 @@ func main() {
 	config.DBConnect()
 
 	r := mux.NewRouter()
+
+	r.Use(logs.Logging)
 
 	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		payload := map[string]string{"message": "Hello, World!"}
@@ -43,7 +47,13 @@ func main() {
 		panic("PORT environment variable is not set")
 	}
 
-	fmt.Println("go auth service running on port:", port)
+	logServiceStart(port)
 
 	log.Fatal(http.ListenAndServe(":"+port, r))
+}
+
+func logServiceStart(port string) {
+	startTime := time.Now().Format(time.RFC1123)
+	message := fmt.Sprintf("🚀 Service running on http://localhost:%s | Started at: %s", port, startTime)
+	log.Println(message)
 }
