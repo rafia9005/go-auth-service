@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"go-auth-service/internal/model/request"
 	"go-auth-service/internal/repository"
-	service "go-auth-service/internal/services"
+	"go-auth-service/internal/services"
 	"go-auth-service/pkg/config"
 	provider "go-auth-service/pkg/providers"
 	"go-auth-service/pkg/utils"
@@ -24,12 +24,12 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if errValidate := service.ValidateLogin(&loginRequest); errValidate != nil {
+	if errValidate := services.ValidateLogin(&loginRequest); errValidate != nil {
 		utils.RespondJSON(w, http.StatusBadRequest, map[string]string{"message": "Validation failed", "error": errValidate.Error()})
 		return
 	}
 
-	user, err := service.AuthenticateUser(loginRequest.Email, loginRequest.Password)
+	user, err := services.AuthenticateUser(loginRequest.Email, loginRequest.Password)
 	if err != nil {
 		utils.RespondJSON(w, http.StatusUnauthorized, map[string]string{"message": "Invalid email or password"})
 		return
@@ -40,20 +40,21 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	accessToken, errGenerateAccessToken := service.GenerateAccessToken(*user)
-	if errGenerateAccessToken != nil {
+	accessToken, err := services.GenerateAccessToken(*user)
+	if err != nil {
 		utils.RespondJSON(w, http.StatusInternalServerError, map[string]string{"message": "Error generating access token"})
 		return
 	}
 
-	refreshToken, errGenerateRefreshToken := service.GenerateRefreshToken(*user, config.DB)
-	if errGenerateRefreshToken != nil {
+	refreshToken, err := services.GenerateRefreshToken(*user, config.DB)
+	if err != nil {
 		utils.RespondJSON(w, http.StatusInternalServerError, map[string]string{"message": "Error generating refresh token"})
 		return
 	}
 
 	utils.RespondJSON(w, http.StatusOK, map[string]interface{}{
-		"status":        true,
+		"status":  true,
+		"message": "User authenticated successfully",
 		"access_token":  accessToken,
 		"refresh_token": refreshToken,
 	})
@@ -66,7 +67,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if errValidate := service.ValidateRegister(&registerRequest); errValidate != nil {
+	if errValidate := services.ValidateRegister(&registerRequest); errValidate != nil {
 		utils.RespondJSON(w, http.StatusBadRequest, map[string]string{"message": "Validation failed", "error": errValidate.Error()})
 		return
 	}
@@ -92,7 +93,7 @@ func AuthGoogle(w http.ResponseWriter, r *http.Request) {
 	if form == "" {
 		form = "/"
 	}
-	url := service.GetGoogleAuthURL(form)
+	url := services.GetGoogleAuthURL(form)
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 }
 
@@ -109,7 +110,7 @@ func CallbackAuthGoogle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userInfo, err := service.GetGoogleUserInfo(token)
+	userInfo, err := services.GetGoogleUserInfo(token)
 	if err != nil {
 		utils.RespondJSON(w, http.StatusInternalServerError, map[string]string{"status": "error", "message": fmt.Sprintf("Failed to get user info: %v", err)})
 		return
@@ -124,14 +125,14 @@ func CallbackAuthGoogle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	existingUser, err := service.GetUserByEmail(email)
+	existingUser, err := services.GetUserByEmail(email)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			if saveErr := repository.SaveGoogleUser(givenName, familyName, email); saveErr != nil {
 				utils.RespondJSON(w, http.StatusInternalServerError, map[string]string{"status": "error", "message": fmt.Sprintf("Failed to save new user data: %v", saveErr)})
 				return
 			}
-			existingUser, err = service.GetUserByEmail(email)
+			existingUser, err = services.GetUserByEmail(email)
 			if err != nil {
 				utils.RespondJSON(w, http.StatusInternalServerError, map[string]string{"status": "error", "message": "Failed to fetch the newly created user"})
 				return
@@ -147,14 +148,14 @@ func CallbackAuthGoogle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	accessToken, errGenerateAccessToken := service.GenerateAccessToken(*existingUser)
-	if errGenerateAccessToken != nil {
+	accessToken, err := services.GenerateAccessToken(*existingUser)
+	if err != nil {
 		utils.RespondJSON(w, http.StatusInternalServerError, map[string]string{"message": "Error generating access token"})
 		return
 	}
 
-	refreshToken, errGenerateRefreshToken := service.GenerateRefreshToken(*existingUser, config.DB)
-	if errGenerateRefreshToken != nil {
+	refreshToken, err := services.GenerateRefreshToken(*existingUser, config.DB)
+	if err != nil {
 		utils.RespondJSON(w, http.StatusInternalServerError, map[string]string{"message": "Error generating refresh token"})
 		return
 	}
@@ -164,6 +165,17 @@ func CallbackAuthGoogle(w http.ResponseWriter, r *http.Request) {
 		"message":       "User authenticated successfully",
 		"access_token":  accessToken,
 		"refresh_token": refreshToken,
+		// "data": map[string]interface{}{
+		//     "user": request.UserResponse{
+		//         ID:        existingUser.ID,
+		//         Name:      existingUser.Name,
+		//         FirstName: existingUser.FirstName,
+		//         LastName:  *existingUser.LastName,
+		//         Email:     existingUser.Email,
+		//         CreatedAt: existingUser.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
+		//         UpdatedAt: existingUser.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
+		//     },
+		// },
 	})
 }
 
@@ -172,7 +184,7 @@ func AuthGithub(w http.ResponseWriter, r *http.Request) {
 	if form == "" {
 		form = "/"
 	}
-	url := service.GetGithubAuthUrl(form)
+	url := services.GetGithubAuthUrl(form)
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 }
 
@@ -189,19 +201,19 @@ func CallbackAuthGithub(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userInfo, err := service.GetGithubUserInfo(token)
+	userInfo, err := services.GetGithubUserInfo(token)
 	if err != nil {
 		utils.RespondJSON(w, http.StatusInternalServerError, map[string]string{"status": "error", "message": fmt.Sprintf("Failed to get user info: %v", err)})
 		return
 	}
 
-	email, err := service.GetGithubUserPrimaryEmail(token)
+	email, err := services.GetGithubUserPrimaryEmail(token)
 	if err != nil {
 		utils.RespondJSON(w, http.StatusInternalServerError, map[string]string{"status": "error", "message": fmt.Sprintf("Failed to get user email: %v", err)})
 		return
 	}
 
-	existingUser, err := service.GetUserByEmail(email)
+	existingUser, err := services.GetUserByEmail(email)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			var firstName, lastName string
@@ -218,7 +230,7 @@ func CallbackAuthGithub(w http.ResponseWriter, r *http.Request) {
 				utils.RespondJSON(w, http.StatusInternalServerError, map[string]string{"status": "error", "message": fmt.Sprintf("Failed to save new user data: %v", saveErr)})
 				return
 			}
-			existingUser, err = service.GetUserByEmail(email)
+			existingUser, err = services.GetUserByEmail(email)
 			if err != nil {
 				utils.RespondJSON(w, http.StatusInternalServerError, map[string]string{"status": "error", "message": "Failed to fetch the newly created user"})
 				return
@@ -234,14 +246,14 @@ func CallbackAuthGithub(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	accessToken, errGenerateAccessToken := service.GenerateAccessToken(*existingUser)
-	if errGenerateAccessToken != nil {
+	accessToken, err := services.GenerateAccessToken(*existingUser)
+	if err != nil {
 		utils.RespondJSON(w, http.StatusInternalServerError, map[string]string{"message": "Error generating access token"})
 		return
 	}
 
-	refreshToken, errGenerateRefreshToken := service.GenerateRefreshToken(*existingUser, config.DB)
-	if errGenerateRefreshToken != nil {
+	refreshToken, err := services.GenerateRefreshToken(*existingUser, config.DB)
+	if err != nil {
 		utils.RespondJSON(w, http.StatusInternalServerError, map[string]string{"message": "Error generating refresh token"})
 		return
 	}
@@ -251,6 +263,17 @@ func CallbackAuthGithub(w http.ResponseWriter, r *http.Request) {
 		"message":       "User authenticated successfully",
 		"access_token":  accessToken,
 		"refresh_token": refreshToken,
+		// "data": map[string]interface{}{
+		//     "user": request.UserResponse{
+		//         ID:        existingUser.ID,
+		//         Name:      existingUser.Name,
+		//         FirstName: existingUser.FirstName,
+		//         LastName:  *existingUser.LastName,
+		//         Email:     existingUser.Email,
+		//         CreatedAt: existingUser.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
+		//         UpdatedAt: existingUser.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
+		//     },
+		// },
 	})
 }
 
@@ -280,32 +303,30 @@ func RefreshTokenHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
-		http.Error(w, "Invalid request payload", http.StatusBadRequest)
+		utils.RespondJSON(w, http.StatusBadRequest, map[string]string{"message": "Invalid request payload"})
 		return
 	}
 
-	user, err := service.ValidateRefreshToken(request.RefreshToken, config.DB)
+	user, err := services.ValidateRefreshToken(request.RefreshToken, config.DB)
 	if err != nil {
-		http.Error(w, "Invalid or expired refresh token", http.StatusUnauthorized)
+		utils.RespondJSON(w, http.StatusUnauthorized, map[string]string{"message": "Invalid or expired refresh token"})
 		return
 	}
 
-	accessToken, err := service.GenerateAccessToken(*user)
+	accessToken, err := services.GenerateAccessToken(*user)
 	if err != nil {
-		http.Error(w, "Failed to generate access token", http.StatusInternalServerError)
+		utils.RespondJSON(w, http.StatusInternalServerError, map[string]string{"message": "Failed to generate access token"})
 		return
 	}
 
-	refreshToken, errGenerateRefreshToken := service.GenerateRefreshToken(*user, config.DB)
-	if errGenerateRefreshToken != nil {
-		http.Error(w, "Failed to generate refresh token", http.StatusInternalServerError)
+	refreshToken, err := services.GenerateRefreshToken(*user, config.DB)
+	if err != nil {
+		utils.RespondJSON(w, http.StatusInternalServerError, map[string]string{"message": "Failed to generate refresh token"})
 		return
 	}
 
-	response := map[string]string{
+	utils.RespondJSON(w, http.StatusOK, map[string]string{
 		"access_token":  accessToken,
 		"refresh_token": refreshToken,
-	}
-
-	utils.RespondJSON(w, http.StatusOK, response)
+	})
 }

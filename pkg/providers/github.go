@@ -21,7 +21,7 @@ func init() {
 	GithubOauthConfig = &oauth2.Config{
 		ClientID:     os.Getenv("GITHUB_CLIENT_ID"),
 		ClientSecret: os.Getenv("GITHUB_CLIENT_SECRET_KEY"),
-		RedirectURL:  "http://localhost:3000/auth/github/callback",
+		RedirectURL:  "http://localhost:3000/api/v1/auth/github/callback",
 		Scopes:       []string{"user:email"},
 		Endpoint:     github.Endpoint,
 	}

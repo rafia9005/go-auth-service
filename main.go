@@ -38,14 +38,16 @@ func main() {
 		utils.RespondJSON(w, http.StatusOK, payload)
 	})
 
-	r.HandleFunc("/login", handler.Login).Methods("POST")
-	r.HandleFunc("/register", handler.Register).Methods("POST")
-	r.HandleFunc("/auth/google", handler.AuthGoogle).Methods("GET")
-	r.HandleFunc("/auth/google/callback", handler.CallbackAuthGoogle).Methods("GET")
-	r.HandleFunc("/auth/github", handler.AuthGithub).Methods("GET")
-	r.HandleFunc("/auth/github/callback", handler.CallbackAuthGithub).Methods("GET")
-	r.HandleFunc("/verify-token", handler.VerifyToken).Methods("GET")
-	r.HandleFunc("/refresh-token", handler.RefreshTokenHandler).Methods("POST")
+	Router := r.PathPrefix("/api/v1").Subrouter()
+
+	Router.HandleFunc("/login", handler.Login).Methods("POST")
+	Router.HandleFunc("/register", handler.Register).Methods("POST")
+	Router.HandleFunc("/auth/google", handler.AuthGoogle).Methods("GET")
+	Router.HandleFunc("/auth/google/callback", handler.CallbackAuthGoogle).Methods("GET")
+	Router.HandleFunc("/auth/github", handler.AuthGithub).Methods("GET")
+	Router.HandleFunc("/auth/github/callback", handler.CallbackAuthGithub).Methods("GET")
+	Router.HandleFunc("/verify-token", handler.VerifyToken).Methods("GET")
+	Router.HandleFunc("/refresh-token", handler.RefreshTokenHandler).Methods("POST")
 
 	port := os.Getenv("PORT")
 	if port == "" {
