@@ -1,4 +1,4 @@
-package handler
+package handlers
 
 import (
 	"context"
@@ -8,6 +8,7 @@ import (
 	"go-auth-service/internal/model/request"
 	"go-auth-service/internal/repository"
 	service "go-auth-service/internal/services"
+	"go-auth-service/pkg/config"
 	provider "go-auth-service/pkg/providers"
 	"go-auth-service/pkg/utils"
 	"net/http"
@@ -39,15 +40,22 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token, errGenerateToken := service.GenerateJWTToken(user)
-	if errGenerateToken != nil {
-		utils.RespondJSON(w, http.StatusInternalServerError, map[string]string{"message": "Error generating token"})
+	accessToken, errGenerateAccessToken := service.GenerateAccessToken(*user)
+	if errGenerateAccessToken != nil {
+		utils.RespondJSON(w, http.StatusInternalServerError, map[string]string{"message": "Error generating access token"})
+		return
+	}
+
+	refreshToken, errGenerateRefreshToken := service.GenerateRefreshToken(*user, config.DB)
+	if errGenerateRefreshToken != nil {
+		utils.RespondJSON(w, http.StatusInternalServerError, map[string]string{"message": "Error generating refresh token"})
 		return
 	}
 
 	utils.RespondJSON(w, http.StatusOK, map[string]interface{}{
-		"status": true,
-		"token":  token,
+		"status":        true,
+		"access_token":  accessToken,
+		"refresh_token": refreshToken,
 	})
 }
 
@@ -128,18 +136,6 @@ func CallbackAuthGoogle(w http.ResponseWriter, r *http.Request) {
 				utils.RespondJSON(w, http.StatusInternalServerError, map[string]string{"status": "error", "message": "Failed to fetch the newly created user"})
 				return
 			}
-			jwtToken, err := service.GenerateJWTToken(existingUser)
-			if err != nil {
-				utils.RespondJSON(w, http.StatusInternalServerError, map[string]string{"status": "error", "message": "Failed to generate JWT token"})
-				return
-			}
-
-			utils.RespondJSON(w, http.StatusOK, map[string]interface{}{
-				"status":  "success",
-				"token":   jwtToken,
-				"message": "Registered with Google successfully",
-			})
-			return
 		} else {
 			utils.RespondJSON(w, http.StatusInternalServerError, map[string]string{"status": "error", "message": fmt.Sprintf("Failed to check if user exists: %v", err)})
 			return
@@ -151,27 +147,23 @@ func CallbackAuthGoogle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	jwtToken, err := service.GenerateJWTToken(existingUser)
-	if err != nil {
-		utils.RespondJSON(w, http.StatusInternalServerError, map[string]string{"status": "error", "message": "Failed to generate JWT token"})
+	accessToken, errGenerateAccessToken := service.GenerateAccessToken(*existingUser)
+	if errGenerateAccessToken != nil {
+		utils.RespondJSON(w, http.StatusInternalServerError, map[string]string{"message": "Error generating access token"})
+		return
+	}
+
+	refreshToken, errGenerateRefreshToken := service.GenerateRefreshToken(*existingUser, config.DB)
+	if errGenerateRefreshToken != nil {
+		utils.RespondJSON(w, http.StatusInternalServerError, map[string]string{"message": "Error generating refresh token"})
 		return
 	}
 
 	utils.RespondJSON(w, http.StatusOK, map[string]interface{}{
-		"status":  "success",
-		"message": "User already exists",
-		"token":   jwtToken,
-		"data": map[string]interface{}{
-			"user": request.UserResponse{
-				ID:        existingUser.ID,
-				Name:      existingUser.Name,
-				FirstName: existingUser.FirstName,
-				LastName:  *existingUser.LastName,
-				Email:     existingUser.Email,
-				CreatedAt: existingUser.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
-				UpdatedAt: existingUser.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
-			},
-		},
+		"status":        "success",
+		"message":       "User authenticated successfully",
+		"access_token":  accessToken,
+		"refresh_token": refreshToken,
 	})
 }
 
@@ -231,18 +223,6 @@ func CallbackAuthGithub(w http.ResponseWriter, r *http.Request) {
 				utils.RespondJSON(w, http.StatusInternalServerError, map[string]string{"status": "error", "message": "Failed to fetch the newly created user"})
 				return
 			}
-			jwtToken, err := service.GenerateJWTToken(existingUser)
-			if err != nil {
-				utils.RespondJSON(w, http.StatusInternalServerError, map[string]string{"status": "error", "message": "Failed to generate JWT token"})
-				return
-			}
-
-			utils.RespondJSON(w, http.StatusOK, map[string]interface{}{
-				"status":  "success",
-				"token":   jwtToken,
-				"message": "Registered with Github successfully",
-			})
-			return
 		} else {
 			utils.RespondJSON(w, http.StatusInternalServerError, map[string]string{"status": "error", "message": fmt.Sprintf("Failed to check if user exists: %v", err)})
 			return
@@ -254,27 +234,23 @@ func CallbackAuthGithub(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	jwtToken, err := service.GenerateJWTToken(existingUser)
-	if err != nil {
-		utils.RespondJSON(w, http.StatusInternalServerError, map[string]string{"status": "error", "message": "Failed to generate JWT token"})
+	accessToken, errGenerateAccessToken := service.GenerateAccessToken(*existingUser)
+	if errGenerateAccessToken != nil {
+		utils.RespondJSON(w, http.StatusInternalServerError, map[string]string{"message": "Error generating access token"})
+		return
+	}
+
+	refreshToken, errGenerateRefreshToken := service.GenerateRefreshToken(*existingUser, config.DB)
+	if errGenerateRefreshToken != nil {
+		utils.RespondJSON(w, http.StatusInternalServerError, map[string]string{"message": "Error generating refresh token"})
 		return
 	}
 
 	utils.RespondJSON(w, http.StatusOK, map[string]interface{}{
-		"status":  "success",
-		"message": "User already exists",
-		"token":   jwtToken,
-		"data": map[string]interface{}{
-			"user": request.UserResponse{
-				ID:        existingUser.ID,
-				Name:      existingUser.Name,
-				FirstName: existingUser.FirstName,
-				LastName:  *existingUser.LastName,
-				Email:     existingUser.Email,
-				CreatedAt: existingUser.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
-				UpdatedAt: existingUser.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
-			},
-		},
+		"status":        "success",
+		"message":       "User authenticated successfully",
+		"access_token":  accessToken,
+		"refresh_token": refreshToken,
 	})
 }
 
@@ -296,4 +272,40 @@ func VerifyToken(w http.ResponseWriter, r *http.Request) {
 		"message": "Token is valid",
 		"claims":  claims,
 	})
+}
+
+func RefreshTokenHandler(w http.ResponseWriter, r *http.Request) {
+	var request struct {
+		RefreshToken string `json:"refresh_token"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+		http.Error(w, "Invalid request payload", http.StatusBadRequest)
+		return
+	}
+
+	user, err := service.ValidateRefreshToken(request.RefreshToken, config.DB)
+	if err != nil {
+		http.Error(w, "Invalid or expired refresh token", http.StatusUnauthorized)
+		return
+	}
+
+	accessToken, err := service.GenerateAccessToken(*user)
+	if err != nil {
+		http.Error(w, "Failed to generate access token", http.StatusInternalServerError)
+		return
+	}
+
+	refreshToken, errGenerateRefreshToken := service.GenerateRefreshToken(*user, config.DB)
+	if errGenerateRefreshToken != nil {
+		http.Error(w, "Failed to generate refresh token", http.StatusInternalServerError)
+		return
+	}
+
+	response := map[string]string{
+		"access_token":  accessToken,
+		"refresh_token": refreshToken,
+	}
+
+	utils.RespondJSON(w, http.StatusOK, response)
 }

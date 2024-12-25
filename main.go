@@ -30,7 +30,11 @@ func main() {
 	r.Use(logs.Logging)
 
 	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		payload := map[string]string{"message": "Hello, World!"}
+		payload := map[string]string{
+			"status":  "Server is running smoothly 🚀",
+			"version": "1.0.0",
+			"message": "Welcome to our awesome API! 🎉",
+		}
 		utils.RespondJSON(w, http.StatusOK, payload)
 	})
 
@@ -41,6 +45,7 @@ func main() {
 	r.HandleFunc("/auth/github", handler.AuthGithub).Methods("GET")
 	r.HandleFunc("/auth/github/callback", handler.CallbackAuthGithub).Methods("GET")
 	r.HandleFunc("/verify-token", handler.VerifyToken).Methods("GET")
+	r.HandleFunc("/refresh-token", handler.RefreshTokenHandler).Methods("POST")
 
 	port := os.Getenv("PORT")
 	if port == "" {

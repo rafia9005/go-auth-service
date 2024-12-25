@@ -16,6 +16,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/go-playground/validator/v10"
 	"golang.org/x/oauth2"
+	"gorm.io/gorm"
 )
 
 // validate login req
@@ -37,7 +38,7 @@ func GenerateJWTToken(user *entity.Users) (string, error) {
 		"id":    user.ID,
 		"name":  user.Name,
 		"email": user.Email,
-		"exp":   time.Now().Add(time.Hour * 24 * 7).Unix(),
+		"exp":   time.Now().Add(5 * time.Minute).Unix(),
 		"role":  "member",
 	}
 
@@ -101,7 +102,6 @@ func GetGoogleUserInfo(token *oauth2.Token) (map[string]interface{}, error) {
 	return userInfo, nil
 }
 
-
 // github users info
 func GetGithubUserInfo(token *oauth2.Token) (map[string]interface{}, error) {
 	client := provider.GithubOauthConfig.Client(context.Background(), token)
@@ -152,4 +152,63 @@ func GetGithubUserPrimaryEmail(token *oauth2.Token) (string, error) {
 	}
 
 	return "", fmt.Errorf("no primary email found")
+}
+
+func GenerateRefreshToken(user entity.Users, db *gorm.DB) (string, error) {
+	claims := jwt.MapClaims{
+		"user_id": user.ID,
+		"exp":     time.Now().Add(7 * 24 * time.Hour).Unix(),
+	}
+
+	token, err := utils.GenerateToken(&claims)
+	if err != nil {
+		return "", err
+	}
+
+	refreshToken := entity.RefreshToken{
+		Token:     token,
+		UserID:    user.ID,
+		ExpiresAt: time.Now().Add(7 * 24 * time.Hour),
+	}
+
+	if err := db.Create(&refreshToken).Error; err != nil {
+		return "", err
+	}
+
+	return token, nil
+}
+
+func GenerateAccessToken(user entity.Users) (string, error) {
+	claims := jwt.MapClaims{
+		"user_id": user.ID,
+		"exp":     time.Now().Add(15 * time.Minute).Unix(),
+	}
+
+	token, err := utils.GenerateToken(&claims)
+	if err != nil {
+		return "", err
+	}
+
+	return token, nil
+}
+
+func ValidateRefreshToken(tokenString string, db *gorm.DB) (*entity.Users, error) {
+	token, err := utils.VerifyToken(tokenString)
+	if err != nil {
+		return nil, err
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok || !token.Valid {
+		return nil, fmt.Errorf("invalid token")
+	}
+
+	userID := uint(claims["user_id"].(float64))
+	var user entity.Users
+
+	if err := db.First(&user, userID).Error; err != nil {
+		return nil, err
+	}
+
+	return &user, nil
 }
