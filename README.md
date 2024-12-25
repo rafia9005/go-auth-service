@@ -18,73 +18,9 @@ Before getting started with go-auth-service, ensure your runtime environment mee
 - **Package Manager:** Go modules
 - **Container Runtime:** Docker
 
+##  API DOCS
 
-###  Installation
-
-Install go-auth-service using one of the following methods:
-
-**Build from source:**
-
-1. Clone the go-auth-service repository:
-```sh
-❯ git clone https://github.com/rafia9005/go-auth-service
-```
-
-2. Navigate to the project directory:
-```sh
-❯ cd go-auth-service
-```
-
-3. Install the project dependencies:
-
-
-**Using `go modules`** &nbsp; [<img align="center" src="https://img.shields.io/badge/Go-00ADD8.svg?style={badge_style}&logo=go&logoColor=white" />](https://golang.org/)
-
-```sh
-❯ go build
-```
-
-
-**Using `docker`** &nbsp; [<img align="center" src="https://img.shields.io/badge/Docker-2CA5E0.svg?style={badge_style}&logo=docker&logoColor=white" />](https://www.docker.com/)
-
-```sh
-❯ docker build -t rafia9005/go-auth-service .
-```
-
-
-
-
-###  Usage
-Run go-auth-service using the following command:
-**Using `go modules`** &nbsp; [<img align="center" src="https://img.shields.io/badge/Go-00ADD8.svg?style={badge_style}&logo=go&logoColor=white" />](https://golang.org/)
-
-```sh
-❯ go run {entrypoint}
-```
-
-
-**Using `docker`** &nbsp; [<img align="center" src="https://img.shields.io/badge/Docker-2CA5E0.svg?style={badge_style}&logo=docker&logoColor=white" />](https://www.docker.com/)
-
-```sh
-❯ docker run -it {image_name}
-```
-
-
-###  Testing
-Run the test suite using the following command:
-**Using `go modules`** &nbsp; [<img align="center" src="https://img.shields.io/badge/Go-00ADD8.svg?style={badge_style}&logo=go&logoColor=white" />](https://golang.org/)
-
-```sh
-❯ go test ./...
-```
-
-
----
-##  Contributing
-
-- **💬 [Join the Discussions](https://github.com/rafia9005/go-auth-service/discussions)**: Share your insights, provide feedback, or ask questions.
-- **🐛 [Report Issues](https://github.com/rafia9005/go-auth-service/issues)**: Submit bugs found or log feature requests for the `go-auth-service` project.
-- **💡 [Submit Pull Requests](https://github.com/rafia9005/go-auth-service/blob/main/CONTRIBUTING.md)**: Review open PRs, and submit your own PRs.
+- **💬 [API DOCS](https://github.com/rafia9005/go-auth-service/blob/main/docs/ROUTE.md)**: API Documentasion Authentication Service.
 
 <details closed>
 <summary>Contributing Guidelines</summary>
