@@ -2,8 +2,8 @@ POST http://localhost:3000/api/v1/register
 Content-type: application/json
 
 {
-  "first_name": "Rafi",
-  "last_name": "Ahmad",
-  "email": "example1@gmail.com",
+  "first_name": "Asep",
+  "last_name": "Kurniawan",
+  "email": "example@gmail.com",
   "password": "admin123"
 }
