@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	handler "go-auth-service/internal/handlers"
+	"go-auth-service/internal/middleware"
 	"go-auth-service/pkg/config"
 	"go-auth-service/pkg/logs"
 	"go-auth-service/pkg/utils"
@@ -38,16 +39,20 @@ func main() {
 		utils.RespondJSON(w, http.StatusOK, payload)
 	})
 
-	Router := r.PathPrefix("/api/v1").Subrouter()
+	router := r.PathPrefix("/api/v1").Subrouter()
 
-	Router.HandleFunc("/login", handler.Login).Methods("POST")
-	Router.HandleFunc("/register", handler.Register).Methods("POST")
-	Router.HandleFunc("/auth/google", handler.AuthGoogle).Methods("GET")
-	Router.HandleFunc("/auth/google/callback", handler.CallbackAuthGoogle).Methods("GET")
-	Router.HandleFunc("/auth/github", handler.AuthGithub).Methods("GET")
-	Router.HandleFunc("/auth/github/callback", handler.CallbackAuthGithub).Methods("GET")
-	Router.HandleFunc("/verify-token", handler.VerifyToken).Methods("GET")
-	Router.HandleFunc("/refresh-token", handler.RefreshTokenHandler).Methods("POST")
+	router.HandleFunc("/auth/login", handler.Login).Methods("POST")
+	router.HandleFunc("/auth/register", handler.Register).Methods("POST")
+	router.HandleFunc("/auth/google", handler.AuthGoogle).Methods("GET")
+	router.HandleFunc("/auth/google/callback", handler.CallbackAuthGoogle).Methods("GET")
+	router.HandleFunc("/auth/github", handler.AuthGithub).Methods("GET")
+	router.HandleFunc("/auth/github/callback", handler.CallbackAuthGithub).Methods("GET")
+	router.HandleFunc("/auth/verify-token", handler.VerifyToken).Methods("GET")
+	router.HandleFunc("/auth/refresh-token", handler.RefreshTokenHandler).Methods("POST")
+
+  protected := router.NewRoute().Subrouter()
+  protected.Use(middleware.Auth)
+  protected.HandleFunc("/profile", handler.Profile).Methods("GET")
 
 	port := os.Getenv("PORT")
 	if port == "" {

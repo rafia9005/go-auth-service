@@ -53,12 +53,12 @@ func DecodeToken(tokenString string) (jwt.MapClaims, error) {
 		return nil, err
 	}
 
-	claims, isOke := token.Claims.(jwt.MapClaims)
-	if isOke && token.Valid {
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if ok && token.Valid {
 		return claims, nil
 	}
 
-	return nil, fmt.Errorf("Invalid Token")
+	return nil, fmt.Errorf("invalid token")
 }
 
 func init() {

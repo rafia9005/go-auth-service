@@ -1,0 +1,2 @@
+GET http://localhost:3000/api/v1/profile
+x-token:eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzUyMjA2NzUsInVzZXJfaWQiOjF9.ewbROamkCrftISIKmqsq28yCNx5lQbwyR6cokbWrSD8

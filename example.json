@@ -1,0 +1,6 @@
+{
+"access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzUxMzU4ODksInVzZXJfaWQiOjR9.X68PoCNrULffvpz5Wa-ofycCva5juM7JS_xIHcj_-Gc",
+"message": "User authenticated successfully",
+"refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzU3Mzk3ODksInVzZXJfaWQiOjR9.kxhxQOxGyjCvl-pn6vykoeuMI_KXt1nJUrujxiN_9-Y",
+"status": true
+}

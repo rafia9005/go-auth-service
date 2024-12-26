@@ -25,7 +25,7 @@ func Auth(next http.Handler) http.Handler {
             return
         }
 
-        userID := uint(claims["id"].(float64))
+        userID := uint(claims["user_id"].(float64))
         var user entity.Users
         if err := config.DB.First(&user, userID).Error; err != nil {
             http.Error(w, "User not found", http.StatusUnauthorized)
