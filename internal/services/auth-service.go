@@ -8,7 +8,7 @@ import (
 	"go-auth-service/internal/model/entity"
 	"go-auth-service/internal/model/request"
 	"go-auth-service/pkg/config"
-	provider "go-auth-service/pkg/providers"
+	"go-auth-service/pkg/provider"
 	"go-auth-service/pkg/utils"
 	"net/http"
 	"time"
