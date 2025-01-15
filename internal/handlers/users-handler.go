@@ -50,13 +50,8 @@ func Profile(w http.ResponseWriter, r *http.Request) {
 		"contact": map[string]interface{}{
 			"phone": user.Contacts[0].Phone,
 		},
-		"refresh_token": user.RefreshTokens[0].Token,
 		"verify":        user.Verify,
 		"provider":      *user.Provider,
-    "address": map[string]interface{}{
-      "city": "Malang",
-      "country": "Indonesian",
-    },
 		"created_at":    user.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
 		"updated_at":    user.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
 	}
