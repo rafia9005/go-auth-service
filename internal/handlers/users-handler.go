@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"go-auth-service/internal/model/entity"
 	"go-auth-service/pkg/config"
 	"go-auth-service/pkg/utils"
@@ -26,8 +25,6 @@ func Profile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Printf("Claims: %+v\n", claims) // Debugging: print the claims
-
 	userID, ok := claims["user_id"].(float64)
 	if !ok {
 		utils.RespondJSON(w, http.StatusUnauthorized, map[string]interface{}{
@@ -44,5 +41,15 @@ func Profile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	utils.RespondJSON(w, http.StatusOK, user)
+	filter := map[string]interface{}{
+		"name":           user.Name,
+		"first_name":     user.FirstName,
+		"last_name":      *user.LastName,
+		"email":          user.Email,
+		"role":           user.Role,
+		"created_at":     user.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
+		"updated_at":     user.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
+	}
+
+	utils.RespondJSON(w, http.StatusOK, filter)
 }

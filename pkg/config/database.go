@@ -22,7 +22,7 @@ func DBConnect() error {
 
 	DB = db
 
-	DB.AutoMigrate(&entity.Users{}, &entity.RefreshToken{})
+	DB.AutoMigrate(&entity.Users{}, &entity.RefreshToken{}, &entity.Contacts{})
 
 	return nil
 }
