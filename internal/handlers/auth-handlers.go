@@ -53,8 +53,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.RespondJSON(w, http.StatusOK, map[string]interface{}{
-		"status":  true,
-		"message": "User authenticated successfully",
 		"access_token":  accessToken,
 		"refresh_token": refreshToken,
 	})
@@ -161,8 +159,6 @@ func CallbackAuthGoogle(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.RespondJSON(w, http.StatusOK, map[string]interface{}{
-		"status":        "success",
-		"message":       "User authenticated successfully",
 		"access_token":  accessToken,
 		"refresh_token": refreshToken,
 		// "data": map[string]interface{}{
@@ -176,6 +172,7 @@ func CallbackAuthGoogle(w http.ResponseWriter, r *http.Request) {
 		//         UpdatedAt: existingUser.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
 		//     },
 		// },
+    // "google": userInfo,
 	})
 }
 
@@ -259,8 +256,6 @@ func CallbackAuthGithub(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.RespondJSON(w, http.StatusOK, map[string]interface{}{
-		"status":        "success",
-		"message":       "User authenticated successfully",
 		"access_token":  accessToken,
 		"refresh_token": refreshToken,
 		// "data": map[string]interface{}{
@@ -274,6 +269,7 @@ func CallbackAuthGithub(w http.ResponseWriter, r *http.Request) {
 		//         UpdatedAt: existingUser.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
 		//     },
 		// },
+		// "github": userInfo,
 	})
 }
 
