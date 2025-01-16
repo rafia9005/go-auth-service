@@ -80,3 +80,23 @@ func SaveGithubUser(fristName, lastName, email string) error {
 
 	return nil
 }
+
+// save gitlab Users
+func SaveGitlabUser(firstName, lastName, email string) error {
+  provider := "gitlab"
+  newUser := entity.Users{
+    Name:      fmt.Sprintf("%s %s", firstName, lastName),
+    FirstName: firstName,
+    LastName:  &lastName,
+    Email:     email,
+    Role:      "member",
+    Verify:    true,
+    Provider:  &provider,
+  }
+
+  if err := config.DB.Create(&newUser).Error; err != nil {
+    return err
+  }
+
+  return nil
+}

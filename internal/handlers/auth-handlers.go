@@ -95,6 +95,15 @@ func AuthGoogle(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 }
 
+func AuthGithub(w http.ResponseWriter, r *http.Request) {
+	form := r.URL.Query().Get("from")
+	if form == "" {
+		form = "/"
+	}
+	url := services.GetGithubAuthUrl(form)
+	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+}
+
 func CallbackAuthGoogle(w http.ResponseWriter, r *http.Request) {
 	code := r.URL.Query().Get("code")
 	if code == "" {
@@ -161,28 +170,7 @@ func CallbackAuthGoogle(w http.ResponseWriter, r *http.Request) {
 	utils.RespondJSON(w, http.StatusOK, map[string]interface{}{
 		"access_token":  accessToken,
 		"refresh_token": refreshToken,
-		// "data": map[string]interface{}{
-		//     "user": request.UserResponse{
-		//         ID:        existingUser.ID,
-		//         Name:      existingUser.Name,
-		//         FirstName: existingUser.FirstName,
-		//         LastName:  *existingUser.LastName,
-		//         Email:     existingUser.Email,
-		//         CreatedAt: existingUser.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
-		//         UpdatedAt: existingUser.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
-		//     },
-		// },
-    // "google": userInfo,
 	})
-}
-
-func AuthGithub(w http.ResponseWriter, r *http.Request) {
-	form := r.URL.Query().Get("from")
-	if form == "" {
-		form = "/"
-	}
-	url := services.GetGithubAuthUrl(form)
-	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 }
 
 func CallbackAuthGithub(w http.ResponseWriter, r *http.Request) {
@@ -258,18 +246,6 @@ func CallbackAuthGithub(w http.ResponseWriter, r *http.Request) {
 	utils.RespondJSON(w, http.StatusOK, map[string]interface{}{
 		"access_token":  accessToken,
 		"refresh_token": refreshToken,
-		// "data": map[string]interface{}{
-		//     "user": request.UserResponse{
-		//         ID:        existingUser.ID,
-		//         Name:      existingUser.Name,
-		//         FirstName: existingUser.FirstName,
-		//         LastName:  *existingUser.LastName,
-		//         Email:     existingUser.Email,
-		//         CreatedAt: existingUser.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
-		//         UpdatedAt: existingUser.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
-		//     },
-		// },
-		// "github": userInfo,
 	})
 }
 

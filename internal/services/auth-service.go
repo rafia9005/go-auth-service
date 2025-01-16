@@ -10,7 +10,10 @@ import (
 	"go-auth-service/pkg/config"
 	"go-auth-service/pkg/provider"
 	"go-auth-service/pkg/utils"
+	"log"
 	"net/http"
+	"net/url"
+	"os"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
