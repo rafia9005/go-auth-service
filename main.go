@@ -49,10 +49,12 @@ func main() {
 	router.HandleFunc("/auth/github/callback", handler.CallbackAuthGithub).Methods("GET")
 	router.HandleFunc("/auth/verify-token", handler.VerifyToken).Methods("GET")
 	router.HandleFunc("/auth/refresh-token", handler.RefreshTokenHandler).Methods("POST")
+  // router.HandleFunc()
 
   protected := router.NewRoute().Subrouter()
   protected.Use(middleware.Auth)
   protected.HandleFunc("/profile", handler.Profile).Methods("GET")
+  protected.HandleFunc("/profile", handler.UpdateProfile).Methods("PATCH")
 
 	port := os.Getenv("PORT")
 	if port == "" {
