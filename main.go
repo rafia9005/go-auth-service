@@ -47,8 +47,6 @@ func main() {
 	router.HandleFunc("/auth/google/callback", handler.CallbackAuthGoogle).Methods("GET")
 	router.HandleFunc("/auth/github", handler.AuthGithub).Methods("GET")
 	router.HandleFunc("/auth/github/callback", handler.CallbackAuthGithub).Methods("GET")
-  router.HandleFunc("/auth/gitlab", handler.AuthGithub).Methods("GET")
-  router.HandleFunc("/auth/gitlab/callback", handler.CallbackAuthGithub).Methods("GET")
 	router.HandleFunc("/auth/verify-token", handler.VerifyToken).Methods("GET")
 	router.HandleFunc("/auth/refresh-token", handler.RefreshTokenHandler).Methods("POST")
 
