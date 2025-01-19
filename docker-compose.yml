@@ -16,7 +16,6 @@ services:
       - GITHUB_CLIENT_SECRET_KEY=${GITHUB_CLIENT_SECRET_KEY}
     depends_on:
       - db
-      - redis
 
   db:
     image: mysql:8.0
