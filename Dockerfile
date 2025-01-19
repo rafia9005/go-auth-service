@@ -7,7 +7,7 @@ RUN go mod download
 
 COPY . . 
 
-RUN go build -o /go-auth-service ./cmd/main.go
+RUN go build -o /go-auth-service ./main.go
 
 FROM alpine:latest
 
