@@ -120,3 +120,7 @@ func UpdateProfile(w http.ResponseWriter, r *http.Request) {
 		"message": "User updated successfully",
 	})
 }
+
+func ChangePassword(w http.ResponseWriter, r *http.Request) {
+  
+}
