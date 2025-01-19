@@ -8,7 +8,7 @@ all: build
 .PHONY: build
 build:
     @echo "Building the application..."
-    go build -o $(APP_NAME) ./main.go
+    go build -o $(APP_NAME) main.go
 
 .PHONY: run
 run: build
