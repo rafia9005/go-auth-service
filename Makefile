@@ -33,7 +33,7 @@ docker-build:
 .PHONY: docker-compose-up
 docker-compose-up:
 	@echo "Starting Docker Compose..."
-	docker-compose -f $(DOCKER_COMPOSE) up --build
+	docker-compose -f $(DOCKER_COMPOSE) up --build -d
 
 .PHONY: docker-compose-down
 docker-compose-down:
